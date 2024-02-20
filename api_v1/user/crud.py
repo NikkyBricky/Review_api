@@ -1,7 +1,7 @@
 import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
-from .schemas import UserCreate
+from .schemas import UserCreate, UserSchema
 from core.models import User
 
 
@@ -24,10 +24,10 @@ async def create_user(
 
 async def log_in_user(
         session: AsyncSession,
-        user_in: UserCreate
+        user_in: UserSchema
 ) -> bool:
-    password = UserCreate(**user_in.model_dump()).password
-    user_id = UserCreate(**user_in.model_dump()).user_id
+    password = UserSchema(**user_in.model_dump()).password
+    user_id = UserSchema(**user_in.model_dump()).user_id
     user = await session.get(User, user_id)
     if user:
         correct_hashed_password = user.password
@@ -41,19 +41,17 @@ async def log_in_user(
     )
 
 
-# async def delete_user_parameters(
+# async def delete_user(
 #         session: AsyncSession,
 #         user: User,
-# ):
+# ) -> None:
 #     await session.delete(user)
 #     await session.commit()
 
 
-async def get_user(
+async def get_user_by_user_id(
         session: AsyncSession,
         user_id: int
-) -> bool:
-    found = await session.get(User, user_id)
-    if found:
-        return True
-    return False
+):
+    return await session.get(User, user_id)
+
