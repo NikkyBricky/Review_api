@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api_v1.project.schemas import ProjectCreate
 from core.models import db_helper, Project
 from api_v1.project import crud
-from ..user.crud import get_user
+from ..user.crud import get_user_by_user_id
 router = APIRouter(tags=["Projects"])
 
 
@@ -23,7 +23,7 @@ async def find_pair_or_create_project(
         ):
     project_in_difficulty = project_in.project_difficulty
     project_in_user_id = project_in.user_id
-    if not await get_user(
+    if not await get_user_by_user_id(
         session=session,
         user_id=project_in_user_id
     ):
