@@ -1,7 +1,7 @@
 import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
-from api_v1.user.schemas import UserCreate
+from .schemas import UserCreate
 from core.models import User
 
 
@@ -39,3 +39,21 @@ async def log_in_user(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"no user with user_id {user_id}"
     )
+
+
+# async def delete_user_parameters(
+#         session: AsyncSession,
+#         user: User,
+# ):
+#     await session.delete(user)
+#     await session.commit()
+
+
+async def get_user(
+        session: AsyncSession,
+        user_id: int
+) -> bool:
+    found = await session.get(User, user_id)
+    if found:
+        return True
+    return False
