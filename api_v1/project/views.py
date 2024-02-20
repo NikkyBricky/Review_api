@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api_v1.project.schemas import ProjectCreate
 from core.models import db_helper, Project
 from api_v1.project import crud
-
+from ..user.crud import get_user
 router = APIRouter(tags=["Projects"])
 
 
@@ -23,6 +23,14 @@ async def find_pair_or_create_project(
         ):
     project_in_difficulty = project_in.project_difficulty
     project_in_user_id = project_in.user_id
+    if not await get_user(
+        session=session,
+        user_id=project_in_user_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"user with user_id {project_in_user_id} is not authorised"
+        )
     project_list = await crud.get_project_by_project_difficulty(
         session=session,
         project_difficulty=project_in_difficulty,
