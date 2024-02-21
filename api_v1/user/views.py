@@ -2,9 +2,9 @@ import sqlalchemy
 from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api_v1.user.schemas import UserSchema, UserCreate
-from core.models import db_helper, User
-from api_v1.user import crud
+from .schemas import UserSchema, UserCreate
+from core.models import db_helper
+from . import crud
 from .crud import get_user_by_user_id
 router = APIRouter(tags=["User"])
 
@@ -30,18 +30,23 @@ async def login_user(
         user_in: UserSchema,
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    return {"success": await crud.log_in_user(session=session, user_in=user_in)}
+    await crud.log_in_user(session=session, user_in=user_in)
+    return "password is correct"
 
 
-# @router.delete("/delete-user/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-# async def delete_user(
-#         user: User = Depends(get_user_by_user_id),
-#         session: AsyncSession = Depends(db_helper.scoped_session_dependency)
-# ) -> None:
-#     await crud.delete_user(session=session, user=user)
+@router.delete("/delete-user", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+        user_id: int,
+        session: AsyncSession = Depends(db_helper.session_dependency)
+):
+    user = await get_user_by_user_id(
+        session=session,
+        user_id=user_id
+    )
+    await crud.delete_user(session=session, user=user)
 
 
-@router.get("/check_user_exists/{user_id}")
+@router.get("/check_user_exists")
 async def check_user(
         user_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency),
@@ -55,4 +60,3 @@ async def check_user(
     else:
         result = False
     return f"user_found: {result}"
-
