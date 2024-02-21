@@ -31,27 +31,38 @@ async def log_in_user(
     user = await session.get(User, user_id)
     if user:
         correct_hashed_password = user.password
-        return bcrypt.checkpw(
+        result = bcrypt.checkpw(
             password=password.encode(),
             hashed_password=correct_hashed_password,
         )
+        if result:
+            return result
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="password is incorrect"
+        )
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"no user with user_id {user_id}"
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=f"user with user_id {user_id} not found"
     )
 
 
-# async def delete_user(
-#         session: AsyncSession,
-#         user: User,
-# ) -> None:
-#     await session.delete(user)
-#     await session.commit()
+async def delete_user(
+        session: AsyncSession,
+        user: User,
+):
+    await session.delete(user)
+    await session.commit()
 
 
 async def get_user_by_user_id(
         session: AsyncSession,
         user_id: int
 ):
-    return await session.get(User, user_id)
-
+    user = await session.get(User, user_id)
+    if user:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=f"user with user_id {user_id} not found"
+    )
