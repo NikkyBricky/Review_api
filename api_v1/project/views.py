@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_v1.project.schemas import ProjectCreate
 from core.models import db_helper, Project
-from api_v1.project import crud
+from api_v1.project import crud, dependencies
 from ..user.crud import get_user_by_user_id
 router = APIRouter(tags=["Projects"])
 
@@ -28,10 +28,10 @@ async def find_pair_or_create_project(
         user_id=project_in_user_id
     ):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"user with user_id {project_in_user_id} is not authorised"
         )
-    project_list = await crud.get_project_by_project_difficulty(
+    project_list = await dependencies.get_project_by_project_difficulty(
         session=session,
         project_difficulty=project_in_difficulty,
     )
@@ -57,12 +57,25 @@ async def find_pair_or_create_project(
     else:
         try:
             await crud.create_project(session=session, project_in=project_in)
-            return "successfully added project to database"
+            raise HTTPException(
+                status_code=status.HTTP_201_CREATED,
+                detail=f"successfully added project from user with user_id {project_in_user_id} to database"
+            )
 
         except sqlalchemy.exc.IntegrityError:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="user already exists"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"project from user with user_id {project_in_user_id} already exists"
             )
 
 
+@router.delete("/delete-project", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_project(
+        user_id: int,
+        session: AsyncSession = Depends(db_helper.session_dependency)
+):
+    project = await dependencies.get_project_by_user_id(session=session, user_id=user_id)
+    await crud.delete_project(
+        session=session,
+        project=project
+    )
