@@ -8,7 +8,7 @@ from core.models import User
 async def create_user(
     session: AsyncSession,
     user_in: UserCreate,
-) -> bool:
+):
     password = UserCreate(**user_in.model_dump()).password
     user_id = UserCreate(**user_in.model_dump()).user_id
     salt = bcrypt.gensalt()
@@ -19,7 +19,6 @@ async def create_user(
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    return True
 
 
 async def log_in_user(
