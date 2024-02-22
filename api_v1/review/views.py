@@ -47,8 +47,8 @@ async def send_review(
     await session.commit()
 
     return {"message": f"user with user_id {review_id} has got a review for user with user_id {user_id}",
-            "reviews": {f"review from user_id {review_id}": review_user_review.review_text,
-                        f"review from user_id {user_id}": user_review_text}
+            "reviews": {f"review for user_id {review_id}": user_review_text,
+                        f"review for user_id {user_id}": review_user_review.review_text}
             }
 
 
