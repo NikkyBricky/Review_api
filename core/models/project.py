@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
-from fastapi import Path
 from .mixins import UserRelationMixin
 
 

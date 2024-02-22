@@ -8,18 +8,18 @@ from core.models import User
 async def create_user(
     session: AsyncSession,
     user_in: UserCreate,
-) -> User:
+) -> bool:
     password = UserCreate(**user_in.model_dump()).password
     user_id = UserCreate(**user_in.model_dump()).user_id
     salt = bcrypt.gensalt()
-    pwd_bytes: bytes = password.encode()
+    pwd_bytes = password.encode()
     hashed_password = bcrypt.hashpw(pwd_bytes, salt)
     user = User(user_id=user_id, password=hashed_password)
 
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    return user
+    return True
 
 
 async def log_in_user(
@@ -39,11 +39,11 @@ async def log_in_user(
             return result
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="password is incorrect"
+            detail={"message": "password is incorrect"}
         )
     raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=f"user with user_id {user_id} not found"
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail={"message": f"user with user_id {user_id} not found"}
     )
 
 
@@ -63,6 +63,6 @@ async def get_user_by_user_id(
     if user:
         return user
     raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=f"user with user_id {user_id} not found"
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail={"message": f"user with user_id {user_id} not found"}
     )
