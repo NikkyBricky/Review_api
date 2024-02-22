@@ -17,11 +17,12 @@ async def create_user(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
     try:
-        return await crud.create_user(session=session, user_in=user_in)
+        await crud.create_user(session=session, user_in=user_in)
+        return {"message": "successfully added user to database"}
     except sqlalchemy.exc.IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="user already exists"
+            detail={"message": "user already exists"}
         )
 
 
@@ -31,7 +32,7 @@ async def login_user(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
     await crud.log_in_user(session=session, user_in=user_in)
-    return "password is correct"
+    return {"message": "password is correct"}
 
 
 @router.delete("/delete-user", status_code=status.HTTP_204_NO_CONTENT)
@@ -44,19 +45,3 @@ async def delete_user(
         user_id=user_id
     )
     await crud.delete_user(session=session, user=user)
-
-
-@router.get("/check_user_exists")
-async def check_user(
-        user_id: int,
-        session: AsyncSession = Depends(db_helper.session_dependency),
-):
-    found_user = await crud.get_user_by_user_id(
-        session=session,
-        user_id=user_id
-    )
-    if found_user:
-        result = True
-    else:
-        result = False
-    return f"user_found: {result}"
