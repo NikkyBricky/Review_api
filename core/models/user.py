@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .project import Project
+    from .review import Review
 
 
 class User(Base):
@@ -11,6 +12,7 @@ class User(Base):
     password: Mapped[bytes]
 
     project: Mapped["Project"] = relationship(back_populates="user")
+    review: Mapped["Review"] = relationship(back_populates="user")
 
     def __str__(self):
         return f"{self.__class__.__name__}(user_id={self.user_id}, password={self.password})"
