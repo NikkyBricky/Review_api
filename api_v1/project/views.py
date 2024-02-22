@@ -6,6 +6,8 @@ from api_v1.project.schemas import ProjectCreate
 from core.models import db_helper, Project
 from api_v1.project import crud, dependencies
 from ..user.crud import get_user_by_user_id
+from ..review.crud import create_review
+from ..review.schemas import ReviewCreate
 router = APIRouter(tags=["Projects"])
 
 
@@ -21,20 +23,29 @@ async def find_pair_or_create_project(
         project_in: ProjectCreate,
         session: AsyncSession = Depends(db_helper.session_dependency),
         ):
+
     project_in_difficulty = project_in.project_difficulty
     project_in_user_id = project_in.user_id
+
     if not await get_user_by_user_id(
         session=session,
         user_id=project_in_user_id
     ):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"user with user_id {project_in_user_id} is not authorised"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": f"user with user_id {project_in_user_id} is not authorised"}
         )
+
+    await dependencies.get_review_by_user_id(
+        session=session,
+        user_id=project_in_user_id
+    )
+
     project_list = await dependencies.get_project_by_project_difficulty(
         session=session,
         project_difficulty=project_in_difficulty,
     )
+
     if project_list:
 
         review_project: Project = project_list[0]
@@ -42,8 +53,8 @@ async def find_pair_or_create_project(
 
         if project_in_user_id == review_project_user_id:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"project from user with user_id {project_in_user_id} already exists"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"message": f"project from user with user_id {project_in_user_id} already exists"}
             )
 
         await crud.delete_project(
@@ -51,21 +62,33 @@ async def find_pair_or_create_project(
             project=review_project
         )
 
+        await create_review(
+            session=session,
+            review_in=ReviewCreate(user_id=project_in_user_id, review_id=review_project_user_id)
+        )
+
+        await create_review(
+            session=session,
+            review_in=ReviewCreate(user_id=review_project_user_id, review_id=project_in_user_id)
+        )
+
         return {"message": f"successfully found pair for user_id {project_in.user_id}",
                 "user for review": review_project}
 
     else:
+
         try:
             await crud.create_project(session=session, project_in=project_in)
             raise HTTPException(
                 status_code=status.HTTP_201_CREATED,
-                detail=f"successfully added project from user with user_id {project_in_user_id} to database"
+                detail={"message": f"successfully added project from user "
+                        f"with user_id {project_in_user_id} to database"}
             )
 
         except sqlalchemy.exc.IntegrityError:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"project from user with user_id {project_in_user_id} already exists"
+                detail={"message": f"project from user with user_id {project_in_user_id} already exists"}
             )
 
 
