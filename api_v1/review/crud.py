@@ -24,6 +24,4 @@ async def get_review_by_user_id(
         return review
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail={"message": f"user with user_id {user_id} does not have a pair "
-                f"to review because he has not send a project yet"}
-    )
+        detail={"message": f"user with user_id {user_id} does not have a pair to review yet"})
