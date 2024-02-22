@@ -1,11 +1,9 @@
-from pydantic import BaseModel
-from typing import Annotated
-from fastapi import Path
+from pydantic import BaseModel, Field
 
 
 class ProjectBase(BaseModel):
     project_link: str
-    project_difficulty: Annotated[int, Path(ge=1, le=10)]
+    project_difficulty: int = Field(ge=1, le=10)
     user_id: int
 
 

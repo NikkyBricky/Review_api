@@ -11,13 +11,6 @@ from ..review.schemas import ReviewCreate
 router = APIRouter(tags=["Projects"])
 
 
-async def get_project_by_user_id(
-    session: AsyncSession,
-    user_id: int,
-) -> Project | None:
-    return await session.get(Project, user_id)
-
-
 @router.post("/find-pair-or-create-project")
 async def find_pair_or_create_project(
         project_in: ProjectCreate,
