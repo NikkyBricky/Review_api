@@ -40,6 +40,6 @@ async def get_user_by_user_id(
     if user:
         return user
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail={"message": f"user with user_id {user_id} is unauthorised"}
     )
