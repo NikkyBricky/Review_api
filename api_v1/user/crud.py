@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from .schemas import UserCreate, UserSchema
 from core.models import User
+from .dependencies import get_user_by_user_id, get_project_by_user_id, get_review_by_user_id
 
 
 async def create_user(
@@ -27,28 +28,43 @@ async def log_in_user(
 ) -> bool:
     password = UserSchema(**user_in.model_dump()).password
     user_id = UserSchema(**user_in.model_dump()).user_id
-    user = await session.get(User, user_id)
-    if user:
-        correct_hashed_password = user.password
-        result = bcrypt.checkpw(
-            password=password.encode(),
-            hashed_password=correct_hashed_password,
-        )
-        if result:
-            return result
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "password is incorrect"}
-        )
+    user = await get_user_by_user_id(
+        session=session,
+        user_id=user_id
+    )
+
+    correct_hashed_password = user.password
+    result = bcrypt.checkpw(
+        password=password.encode(),
+        hashed_password=correct_hashed_password,
+    )
+    if result:
+        return result
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail={"message": f"user with user_id {user_id} is unauthorised"}
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail={"message": "password is incorrect"}
     )
 
 
 async def delete_user(
         session: AsyncSession,
-        user: User,
+        user_id: int,
 ):
+    user = await get_user_by_user_id(
+        session=session,
+        user_id=user_id
+    )
+
+    await get_project_by_user_id(
+        session=session,
+        user_id=user_id
+    )
+
+    await get_review_by_user_id(
+        session=session,
+        user_id=user_id
+    )
+
     await session.delete(user)
+
     await session.commit()
