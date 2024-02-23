@@ -41,7 +41,7 @@ async def log_in_user(
             detail={"message": "password is incorrect"}
         )
     raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=status.HTTP_404_NOT_FOUND,
         detail={"message": f"user with user_id {user_id} is unauthorised"}
     )
 
