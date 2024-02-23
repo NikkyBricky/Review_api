@@ -42,7 +42,7 @@ async def log_in_user(
         )
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
-        detail={"message": f"user with user_id {user_id} not found"}
+        detail={"message": f"user with user_id {user_id} is unauthorised"}
     )
 
 
@@ -52,16 +52,3 @@ async def delete_user(
 ):
     await session.delete(user)
     await session.commit()
-
-
-async def get_user_by_user_id(
-        session: AsyncSession,
-        user_id: int
-):
-    user = await session.get(User, user_id)
-    if user:
-        return user
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail={"message": f"user with user_id {user_id} not found"}
-    )
