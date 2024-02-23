@@ -1,9 +1,11 @@
+from typing import Annotated
+from annotated_types import MinLen
 from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
     user_id: int
-    password: str
+    password: Annotated[str, MinLen(8)]
 
 
 class UserCreate(UserBase):
