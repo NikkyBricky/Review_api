@@ -1,6 +1,5 @@
-from typing import Annotated
-
-from fastapi import Path, status, HTTPException
+from fastapi import status, HTTPException
+from pydantic import Field
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +8,7 @@ from core.models import Project, Review
 
 async def get_project_by_project_difficulty(
         session: AsyncSession,
-        project_difficulty: Annotated[int, Path(ge=1, le=10)]
+        project_difficulty: int = Field(ge=1, le=10)
 ) -> list[Project]:
     stmt = (
         select(Project)
@@ -42,6 +41,6 @@ async def get_review_by_user_id(
     review = await session.get(Review, user_id)
     if review:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail={"message": f"user with user_id {user_id} already has got a project for review"}
         )
