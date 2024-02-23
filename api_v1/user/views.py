@@ -5,7 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .schemas import UserSchema, UserCreate
 from core.models import db_helper
 from . import crud
-from .crud import get_user_by_user_id
+from .dependencies import get_project_by_user_id, get_review_by_user_id, get_user_by_user_id
+
 router = APIRouter(tags=["User"])
 
 
@@ -17,7 +18,10 @@ async def create_user(
 ):
     try:
         await crud.create_user(session=session, user_in=user_in)
-        return {"message": "successfully added user to database"}
+        raise HTTPException(
+            status_code=status.HTTP_201_CREATED,
+            detail={"message": "successfully added user to database"}
+        )
     except sqlalchemy.exc.IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -39,8 +43,20 @@ async def delete_user(
         user_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
+
     user = await get_user_by_user_id(
         session=session,
         user_id=user_id
     )
+
+    await get_project_by_user_id(
+        session=session,
+        user_id=user_id
+    )
+
+    await get_review_by_user_id(
+        session=session,
+        user_id=user_id
+    )
+
     await crud.delete_user(session=session, user=user)
