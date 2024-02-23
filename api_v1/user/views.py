@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .schemas import UserSchema, UserCreate
 from core.models import db_helper
 from . import crud
-from .dependencies import get_project_by_user_id, get_review_by_user_id, get_user_by_user_id
 
 router = APIRouter(tags=["User"])
 
@@ -41,20 +40,4 @@ async def delete_user(
         user_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-
-    user = await get_user_by_user_id(
-        session=session,
-        user_id=user_id
-    )
-
-    await get_project_by_user_id(
-        session=session,
-        user_id=user_id
-    )
-
-    await get_review_by_user_id(
-        session=session,
-        user_id=user_id
-    )
-
-    await crud.delete_user(session=session, user=user)
+    await crud.delete_user(session=session, user_id=user_id)
