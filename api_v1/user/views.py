@@ -17,11 +17,9 @@ async def create_user(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
     try:
-        await crud.create_user(session=session, user_in=user_in)
-        raise HTTPException(
-            status_code=status.HTTP_201_CREATED,
-            detail={"message": "successfully added user to database"}
-        )
+        await crud.create_user(session=session, user_in=user_in),
+        return {"message": "successfully added user to database"}
+
     except sqlalchemy.exc.IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -29,7 +27,7 @@ async def create_user(
         )
 
 
-@router.post("/login-user")
+@router.post("/login-user", status_code=status.HTTP_200_OK)
 async def login_user(
         user_in: UserSchema,
         session: AsyncSession = Depends(db_helper.session_dependency)

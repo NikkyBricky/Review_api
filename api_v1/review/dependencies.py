@@ -22,12 +22,12 @@ async def get_review_by_user_id(
     )
     if project_exists:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail={"message": f"user with user_id {user_id} does not have a pair to review yet"}
         )
 
     raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=status.HTTP_404_NOT_FOUND,
         detail={"message": f"user with user_id {user_id} has not sent a project yet"}
     )
 
