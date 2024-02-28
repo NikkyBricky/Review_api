@@ -1,4 +1,5 @@
 import bcrypt
+import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from .schemas import UserCreate, UserSchema
@@ -18,7 +19,14 @@ async def create_user(
     user = User(user_id=user_id, password=hashed_password)
 
     session.add(user)
-    await session.commit()
+    try:
+        await session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "user already exists"}
+        )
+
     await session.refresh(user)
 
 

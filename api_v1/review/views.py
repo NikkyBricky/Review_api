@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .schemas import ReviewSend, ReviewSchema
+from .schemas import ReviewSend
 from core.models import db_helper
-from .dependencies import get_review_by_user_id
+from .crud import process_review, delete_review
+
 router = APIRouter(tags=["Reviews"])
 
 
@@ -13,42 +14,16 @@ async def send_review(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
 
-    user_id = review_in.user_id
+    pairs = await process_review(session=session, review_in=review_in)
 
-    user_review = await get_review_by_user_id(
-        session=session,
-        user_id=user_id
-    )
-
-    review_id = user_review.review_id
-
-    review_user_review = await get_review_by_user_id(
-        session=session,
-        user_id=review_id
-    )
-
-    if review_user_review.review_text == "no review":
-
-        for review_data, value in review_in.model_dump(exclude_none=True).items():
-            setattr(user_review, review_data, value)
-        await session.commit()
-
-        raise HTTPException(
-            status_code=status.HTTP_201_CREATED,
-            detail={"message": f"successfully added review from user with user_id {user_id} to database"}
-        )
-
-    user_review_text = review_in.review_text
-
-    await session.delete(user_review)
-
-    await session.delete(review_user_review)
-
-    await session.commit()
+    user_id = pairs[0]
+    review_user_review_text = pairs[1]
+    review_id = pairs[2]
+    user_review_text = pairs[3]
 
     return {"message": f"user with user_id {review_id} has got a review for user with user_id {user_id}",
             "reviews": {f"review for user_id {review_id}": user_review_text,
-                        f"review for user_id {user_id}": review_user_review.review_text}
+                        f"review for user_id {user_id}": review_user_review_text}
             }
 
 
@@ -58,19 +33,6 @@ async def delete_review_text(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
 
-    review_schema = ReviewSchema(user_id=user_id, review_text="no review")
-    review = await get_review_by_user_id(session=session, user_id=user_id)
-
-    if review.review_text == "no review":
-
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": f"user with user_id {user_id} does not have a review yet"}
-        )
-
-    for review_data, value in review_schema.model_dump(exclude_none=True).items():
-        setattr(review, review_data, value)
-
-    await session.commit()
+    await delete_review(session=session, user_id=user_id)
 
     return {"message": f"Successfully deleted review from user with user_id {user_id}"}
