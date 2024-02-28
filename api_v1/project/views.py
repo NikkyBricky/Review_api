@@ -7,7 +7,7 @@ from api_v1.project import crud, dependencies
 from ..user.dependencies import get_user_by_user_id
 from ..review.crud import create_review
 from ..review.schemas import ReviewCreate
-from .rules_for_review import rules_for_review
+from core.config import settings
 router = APIRouter(tags=["Projects"])
 
 
@@ -60,7 +60,7 @@ async def find_pair_or_create_project(
         return {"message": f"successfully found pair for user_id {project_in.user_id}",
                 "user_data": project_in,
                 "user for review": review_project,
-                "rules": rules_for_review}
+                "rules": settings.rules_for_review}
 
     else:
 
