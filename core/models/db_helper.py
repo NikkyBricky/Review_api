@@ -19,7 +19,6 @@ class Databasehelper:
     async def session_dependency(self) -> AsyncSession:
         async with self.session_factory() as session:
             yield session
-            await session.close()
 
 
 db_helper = Databasehelper(url=settings.db.url)
