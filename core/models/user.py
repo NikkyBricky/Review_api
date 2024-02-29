@@ -11,7 +11,7 @@ class User(Base):
     user_id: Mapped[int]
     password: Mapped[bytes]
 
-    project: Mapped["Project"] = relationship(back_populates="user")
+    project: Mapped["Project"] = relationship(back_populates="user", cascade="all, delete")
     review: Mapped["Review"] = relationship(back_populates="user")
 
     def __str__(self):

@@ -4,15 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from .schemas import UserCreate, UserSchema
 from core.models import User
-from .dependencies import get_user_by_user_id, get_project_by_user_id, get_review_by_user_id
+from .dependencies import get_user_by_user_id, get_review_by_user_id
 
 
 async def create_user(
     session: AsyncSession,
     user_in: UserCreate,
 ):
-    password = UserCreate(**user_in.model_dump()).password
-    user_id = UserCreate(**user_in.model_dump()).user_id
+    password = user_in.password
+    user_id = user_in.user_id
     salt = bcrypt.gensalt()
     pwd_bytes = password.encode()
     hashed_password = bcrypt.hashpw(pwd_bytes, salt)
@@ -59,11 +59,6 @@ async def delete_user(
         user_id: int,
 ):
     user = await get_user_by_user_id(
-        session=session,
-        user_id=user_id
-    )
-
-    await get_project_by_user_id(
         session=session,
         user_id=user_id
     )
