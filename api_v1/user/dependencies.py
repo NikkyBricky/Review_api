@@ -1,21 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import Project, Review, User
-
-
-async def get_project_by_user_id(
-        session: AsyncSession,
-        user_id: int
-):
-
-    project = await session.get(Project, user_id)
-
-    if project:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": f"cannot delete user with user_id {user_id} while he has got a project in database"}
-        )
+from core.models import Review, User
 
 
 async def get_review_by_user_id(
