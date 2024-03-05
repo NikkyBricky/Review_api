@@ -1,4 +1,5 @@
 from requests import get
+from fastapi import HTTPException, status
 
 
 class CheckLink:
@@ -34,17 +35,26 @@ class CheckLink:
     def gits(self):
         if 'https://github.com/' in self.link:
             return True
-        raise ValueError('Ссылка которую вы передали не ведёт на github.')
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": 'Ссылка которую вы передали не ведёт на github.'}
+        )
 
     def sites(self):
         resp = get(self.link)
         if resp.status_code == 200:
             return True
         elif resp.status_code == 404:
-            raise ValueError('Страница не найдена.')
-        else:
-            raise ValueError(f'Код ошибки - {resp.status_code}')
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"message": 'Страница не найдена.'}
+            )
 
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"message": f'Код ошибки - {resp.status_code}'}
+            )
 
 # check = CheckLink(link='https://gthub.com/Palenhame/Django_2.git',
 #                   full=True
