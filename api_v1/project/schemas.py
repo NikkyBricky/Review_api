@@ -12,7 +12,7 @@ class ProjectBase(BaseModel):
         return CheckLink(
             link=value,
             full=True
-        )
+        ).main()
 
 
 class ProjectCreate(ProjectBase):
