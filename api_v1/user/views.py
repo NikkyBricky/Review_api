@@ -5,7 +5,7 @@ from .schemas import UserSchema, UserCreate
 from core.models import db_helper
 from . import crud
 
-router = APIRouter(tags=["User"])
+router = APIRouter(tags=["Users"])
 
 
 @router.post("/register-user",
