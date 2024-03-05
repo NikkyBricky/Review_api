@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator
-from validators import CheckLink
+from .validators import CheckLink
 
 
 class ProjectBase(BaseModel):
