@@ -10,7 +10,7 @@ class ProjectBase(BaseModel):
     @validator('project_link')
     def check_link(cls, value):
         return CheckLink(
-            link='value',
+            link=value,
             full=True
         )
 

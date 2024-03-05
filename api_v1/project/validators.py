@@ -46,9 +46,9 @@ class CheckLink:
             raise ValueError(f'Код ошибки - {resp.status_code}')
 
 
-# check = CheckLink(link='https://github.com/Palenhame/Django_2.git',
-#                   nickname='Palenhame',
-#                   project_name='Django_2',
-#                   author=True)
+# check = CheckLink(link='https://gthub.com/Palenhame/Django_2.git',
+#                   full=True
+#                   )
+# print(check.main())
 # if check.main():
 #     print('All good')
