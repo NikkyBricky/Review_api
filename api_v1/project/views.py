@@ -7,7 +7,6 @@ from api_v1.project import crud, dependencies
 from ..user.dependencies import get_user_by_user_id
 from ..review.crud import create_review
 from ..review.schemas import ReviewCreate
-from core.config import settings
 router = APIRouter(tags=["Projects"])
 
 
@@ -19,7 +18,6 @@ async def find_pair_or_create_project(
 
     project_in_difficulty = project_in.project_difficulty
     project_in_user_id = project_in.user_id
-
     await get_user_by_user_id(
         session=session,
         user_id=project_in_user_id
@@ -39,7 +37,6 @@ async def find_pair_or_create_project(
 
         review_project: Project = project_list[0]
         review_project_user_id = review_project.user_id
-
         if project_in_user_id == review_project_user_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -59,8 +56,7 @@ async def find_pair_or_create_project(
 
         return {"message": f"successfully found pair for user_id {project_in.user_id}",
                 "user_data": project_in,
-                "user for review": review_project,
-                "rules": settings.rules_for_review}
+                "user for review": review_project}
 
     else:
 
