@@ -11,7 +11,7 @@ async def create_project(
         session: AsyncSession,
         project_in: ProjectCreate
 ) -> Project:
-    project = Project(**project_in.model_dump())
+    project = Project(**project_in.model_dump(exclude_unset=True))
 
     session.add(project)
 
