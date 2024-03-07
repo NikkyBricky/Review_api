@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .dependencies import get_review_by_user_id
-from .schemas import ReviewCreate, ReviewSend, ReviewSchema
+from .schemas import ReviewCreate, ReviewSend, ReviewDelete
 from core.models import Review
 
 
@@ -21,7 +21,6 @@ async def create_review(
 
     await session.refresh(review_1)
     await session.refresh(review_2)
-
 
 
 async def process_review(
@@ -44,7 +43,7 @@ async def process_review(
     review_user_review_text = review_user_review.review_text
     if review_user_review_text == "no review":
 
-        for review_data, value in review_in.model_dump(exclude_none=True).items():
+        for review_data, value in review_in.model_dump(exclude_unset=True).items():
             setattr(user_review, review_data, value)
         await session.commit()
 
@@ -68,7 +67,7 @@ async def delete_review(
         session: AsyncSession,
         user_id: int
 ):
-    review_schema = ReviewSchema(user_id=user_id, review_text="no review")
+    review_schema = ReviewDelete(user_id=user_id)
     review = await get_review_by_user_id(session=session, user_id=user_id)
 
     if review.review_text == "no review":
