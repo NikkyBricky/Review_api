@@ -37,7 +37,7 @@ class CheckLink:
             return True
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": 'Ссылка которую вы передали не ведёт на github.'}
+            detail={"message": 'The link, you have sent does not go to github. Please use: \"https://github.com/...\"'}
         )
 
     def sites(self):
@@ -47,13 +47,13 @@ class CheckLink:
         elif resp.status_code == 404:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail={"message": 'Страница не найдена.'}
+                detail={"message": 'Project not found.'}
             )
 
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail={"message": f'Код ошибки - {resp.status_code}'}
+                detail={"message": {'error code': {resp.status_code}}}
             )
 
 # check = CheckLink(link='https://github.com/Palenhame/Django_2.git',
