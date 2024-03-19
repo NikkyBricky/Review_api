@@ -46,7 +46,7 @@ class CheckLink:
             return True
         elif resp.status_code == 404:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_404_BAD_REQUEST,
                 detail={"message": 'Project not found.'}
             )
 
