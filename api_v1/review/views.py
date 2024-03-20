@@ -22,10 +22,10 @@ async def send_review(
     user_review_text = pairs[3]
 
     return {"message": f"user with user_id {review_id} has got a review for user with user_id {user_id}",
-            "reviews": {"user_id 1": {review_id},
-                        "review for 1": user_review_text,
-                        "user_id 2": {user_id},
-                        "review for 2": review_user_review_text}
+            "reviews": {"user_id_1": {review_id},
+                        "review_for_1": user_review_text,
+                        "user_id_2": {user_id},
+                        "review_for_2": review_user_review_text}
             }
 
 
