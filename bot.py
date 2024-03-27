@@ -1,6 +1,6 @@
 import requests
 import telebot
-from telebot.types import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telebot.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand, BotCommandScope
 import os
 from dotenv import load_dotenv
 
@@ -28,6 +28,18 @@ delete_review_keyboard = make_reply_keyboard(["Удалить ревью"])
 
 @bot.message_handler(commands=["start"])
 def start_bot(message):
+    commands = [  # Установка списка команд с областью видимости и описанием
+        BotCommand('start', 'запуск бота'),
+        BotCommand('register', 'зарегистрироваться'),
+        BotCommand('send_project', 'отправить проект'),
+        BotCommand('delete_project', 'удалить проект'),
+        BotCommand('send_review ', 'отправить ревью'),
+        BotCommand('delete_review', 'удалить ревью')
+    ]
+
+    bot.set_my_commands(commands)
+    BotCommandScope('private', chat_id=message.chat.id)
+
     bot.send_message(message.chat.id, "Привет! Я бот, который предоставит вам возможность писать ревью на проекты"
                                       "других людей и получать ревью на ваши. Для начала вам нужно зарегистрироваться.",
                      reply_markup=register_keyboard)
