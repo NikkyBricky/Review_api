@@ -18,6 +18,7 @@ pydantic = "^2.6.1"
 pydantic-settings = "^2.2.1"
 asyncpg = "^0.29.0"
 requests = "^2.31.0"
+pytelegrambotapi = "^4.16.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.1"
