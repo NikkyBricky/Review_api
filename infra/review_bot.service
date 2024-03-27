@@ -1,0 +1,11 @@
+[Unit]
+Description=review bot for yandex
+
+[Service]
+Type=simple
+ExecStart=/home/student/Kudesniki_review_api/venv/bin/python3 /home/student/Kudesniki_review_api/bot.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
