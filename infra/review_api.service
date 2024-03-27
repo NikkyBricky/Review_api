@@ -1,5 +1,5 @@
 [Unit]
-Description=api example for deploy
+Description=review api for yandex
 
 [Service]
 Type=simple
