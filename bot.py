@@ -28,7 +28,7 @@ delete_review_keyboard = make_reply_keyboard(["Удалить ревью"])
 
 @bot.message_handler(commands=["start"])
 def start_bot(message):
-    commands = [  # Установка списка команд с областью видимости и описанием
+    commands = [
         BotCommand('start', 'запуск бота'),
         BotCommand('register', 'зарегистрироваться'),
         BotCommand('send_project', 'отправить проект'),
@@ -46,7 +46,7 @@ def start_bot(message):
 
 
 @bot.message_handler(commands=["register"])
-@bot.message_handler(content_types=["text"], func=lambda message: message.text.lower() == "зарегистрироваться🔐")
+@bot.message_handler(content_types=["text"], func=lambda message: message.text.lower() == "зарегистрироваться")
 def start_registering(message):
     bot.send_message(message.chat.id, "Придумайте пароль <b>(не менее 8 символов)</b>:",
                      reply_markup=ReplyKeyboardRemove(), parse_mode="html")
@@ -125,7 +125,8 @@ def ask_about_rules(message, link):
                                       "взаимодействовать с ним.\n\n"
                                       "4. Присутствует документация к проекту.\n\n"
                                       "5. Функции реализованы без багов и работают так, "
-                                      "как описаны в документации к проекту.", parse_mode="html")
+                                      "как описаны в документации к проекту.\n\n"
+                                      "Критерии для ревью должны состоять минимум из 30 символов.", parse_mode="html")
 
     bot.register_next_step_handler(message, send_project, link, difficulty)
 
@@ -174,8 +175,11 @@ def send_project(message, link, difficulty):
                                               ' "Удалить проект".', reply_markup=delete_project_keyboard)
 
     if status == 422:
-        bot.send_message(message.chat.id, "Уровень сложности должен быть числом от 1 до 10.",
-                         reply_markup=send_project_keyboard)
+        if "string_too_short" in resp.json()["detail"][0]["type"]:
+            bot.send_message(message.chat.id, "Критерии для ревью должны состоять минимум из 30 символов.")
+        else:
+            bot.send_message(message.chat.id, "Уровень сложности должен быть числом от 1 до 10.",
+                             reply_markup=send_project_keyboard)
         get_project_link(message)
         return
 
