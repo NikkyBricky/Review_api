@@ -18,7 +18,7 @@ class CheckLink:
             self.git = git
             self.site = site
             self.full = full
-
+    # TODO Не очень хороший нейминг
     def main(self):
         answer = False
         if self.full:
@@ -55,7 +55,9 @@ class CheckLink:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"message": {'error code': {resp.status_code}}}
             )
-
+        
+    # TODO Окей, взял свои слова назад насчет класса, сделано прикольно
+# TODO дебажный код лучше удалять
 # check = CheckLink(link='https://gthub.com/Palenhame/Django_2.git',
 #                   full=True
 #                   )

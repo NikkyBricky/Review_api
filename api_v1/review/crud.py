@@ -5,7 +5,7 @@ from .dependencies import get_review_by_user_id
 from .schemas import ReviewCreate, ReviewSend, ReviewDelete
 from core.models import Review
 
-
+#TODO Тут все аналогично project
 async def create_review(
         session: AsyncSession,
         review_in_1: ReviewCreate,

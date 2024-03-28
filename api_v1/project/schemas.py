@@ -13,6 +13,7 @@ class ProjectBase(BaseModel):
     user_id: int
     rules: Annotated[str, MinLen(30)] = settings.rules_for_review
 
+    # TODO Я бы не особо парился с созданием класса под это, но дело ваше
     @validator('project_link')
     def check_link(cls, value):
         return CheckLink(
@@ -20,7 +21,7 @@ class ProjectBase(BaseModel):
             full=True
         ).main()
 
-
+# TODO Это чисто для будущего расширения?
 class ProjectCreate(ProjectBase):
     pass
 

@@ -15,11 +15,12 @@ async def send_review(
 ):
 
     pairs = await process_review(session=session, review_in=review_in)
-
+    # TODO Вот тут можно было просто развернуть весь список *pairs
     user_id = pairs[0]
     review_user_review_text = pairs[1]
     review_id = pairs[2]
     user_review_text = pairs[3]
+    # TODO Дебажные принты лучше удалять
     print(pairs, user_id, review_user_review_text, review_id, user_review_text)
     return {"message": f"user with user_id {review_id} has got a review for user with user_id {user_id}",
             "reviews": {"user_id_1": review_id,
