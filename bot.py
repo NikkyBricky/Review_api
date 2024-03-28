@@ -334,6 +334,3 @@ def delete_review(message):
 
     if status == 404:
         bot.send_message(message.chat.id, "На данный момент вы не находитесь в паре для ревью.")
-
-
-bot.infinity_polling()
