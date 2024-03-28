@@ -4,6 +4,7 @@ from core.config import settings
 from api_description import description, summary, version, title
 
 app = FastAPI(
+    # TODO Как будто бы эти переменные тоже можно сделать большими буквами 
     title=title,
     description=description,
     summary=summary,
@@ -11,7 +12,7 @@ app = FastAPI(
 
 app.include_router(router=router_v1, prefix=settings.api_v1_prefix)
 
-
+# TODO Ну вот это явно стоит удалить в деплойнутой версии
 @app.get("/")
 def start_message():
     return {"message": "Hi there! This is an api for reviewing projects."}

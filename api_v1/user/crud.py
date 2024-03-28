@@ -23,6 +23,7 @@ async def create_user(
     try:
         await session.commit()
     except sqlalchemy.exc.IntegrityError:
+        #TODO Я бы делал проверку на существование, так как ошибки - дело крайне многоресурсное
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"message": "user already exists"}

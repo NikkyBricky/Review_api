@@ -5,20 +5,22 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-token = os.getenv("TOKEN")
+token = os.getenv("TOKEN") # TODO Не очень хорошо в итоге вышло, у нас же есть файл с настройкми конфигом в самой апишке. Я бы его вынес на уровень выше и покидал бы это в те же настройки
 bot = telebot.TeleBot(token=token)
 
+# TODO Вот это кстати константа еще
 basic_url = "http://158.160.138.75/api/v1/"
 
+# TODO Вообще мне не очень нравится структура бота в итоге, я бы создал папку bot, в которой бы и лежали все модули
 
-def make_reply_keyboard(args):
+def make_reply_keyboard(args): # Вот это я бы перенес в файл keys
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     for arg in args:
         keyboard.add(arg)
 
     return keyboard
 
-
+# TODO Создавать все клавиатуры сразу - не очень хорошая затея, мы тратим на них память даже если они никогда не будут использоваться
 register_keyboard = make_reply_keyboard(["Зарегистрироваться"])
 send_project_keyboard = make_reply_keyboard(["Отправить проект"])
 delete_project_keyboard = make_reply_keyboard(["Удалить проект"])
@@ -37,6 +39,7 @@ def start_bot(message):
         BotCommand('delete_review', 'удалить ревью')
     ]
 
+    # TODO Вот это лучше вынести прям перед пулингом
     bot.set_my_commands(commands)
     BotCommandScope('private', chat_id=message.chat.id)
 
@@ -110,13 +113,13 @@ def get_project_difficulty(message):
                                       "6. Отсутствует модульность проекта. "
                                       "Все элементы, относящиеся к разным задачам,"
                                       " собраны в одном файле.  <b>(+2 балла)</b>\n\n", parse_mode="html")
-
+    # TODO Вот тут нужна проверка на то что юзеро вводит нормальные вещи
     bot.register_next_step_handler(message, ask_about_rules, link)
 
 
 def ask_about_rules(message, link):
     difficulty = message.text
-
+    # TODO Как и тут
     bot.send_message(message.chat.id, "Если хотите отправить критерии к проекту, то можете это сделать прямо"
                                       "сейчас. Если нет (отправьте 1), то будут отправлены базовые критерии:\n\n"
                                       "1. Код хорошо читается и понятно организован\n\n"
@@ -127,7 +130,6 @@ def ask_about_rules(message, link):
                                       "5. Функции реализованы без багов и работают так, "
                                       "как описаны в документации к проекту.\n\n"
                                       "Критерии для ревью должны состоять минимум из 30 символов.", parse_mode="html")
-
     bot.register_next_step_handler(message, send_project, link, difficulty)
 
 
@@ -140,7 +142,7 @@ def send_project(message, link, difficulty):
             "user_id": user_id,
             "project_link": link,
             "project_difficulty": difficulty}
-
+    # TODO Вот эта единица это супер неудобно в итоге, я бы сделал а) слово какое-то б) загнал бы это слово в константу для лучшей читаемости
     if rules != "1":
         data["rules"] = str(rules)
 
@@ -172,7 +174,7 @@ def send_project(message, link, difficulty):
                                               " Дождитесь его ревью прежде чем отправить следующий, "
                                               "либо удалите его, используя команду /delete_project или с помощью кнопки"
                                               ' "Удалить проект".', reply_markup=delete_project_keyboard)
-
+    # TODO вот тут elif
     if status == 422:
         if "string_too_short" in resp.json()["detail"][0]["type"]:
             bot.send_message(message.chat.id, "Критерии для ревью должны состоять минимум из 30 символов.",
@@ -208,7 +210,7 @@ def send_project(message, link, difficulty):
         user_id_2 = user_data_2["user_id"]
         link_2 = user_data_2["project_link"]
         rules_2 = user_data_2["rules"]
-
+        # TODO Вот тут надо переработать все, но пока не могу сказать как именно, нужно подумать
         for user in [user_id_1, user_id_2]:
             bot.send_message(chat_id=user, text="Пара для ревью успешно найдена. Можете начать работу над ним."
                                                 " Примечание:\nВаше ревью должно состоять "
@@ -275,14 +277,14 @@ def send_review(message):
         bot.send_message(message.chat.id, "Кажется, вы не авторизованы, поэтому вы не можете отправить проект. "
                                           "Чтобы авторизоваться, используйте команду /register или кнопку"
                                           ' "Зарегистрироваться"', reply_markup=register_keyboard)
-
+    # TODO elif
     if status == 404:
         resp = resp.json()["detail"]["message"]
 
         if "pair" in resp:
             bot.send_message(message.chat.id, "Ваша очередь еще не подошла, поэтому у вас пока нет пары для ревью.",
                              reply_markup=delete_project_keyboard)
-
+        # TODO elif
         if "project" in resp:
             bot.send_message(message.chat.id, "На данный момент у вас нет ни одного проекта в базе данных.",
                              reply_markup=send_project_keyboard)

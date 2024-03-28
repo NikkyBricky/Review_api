@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-
+#TODO Вот это кстати делать то не нужно, у нас же есть настройки от пайдантика, там есть встроенная способность парсинга энв файла
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")

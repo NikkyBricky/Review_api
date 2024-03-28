@@ -22,6 +22,7 @@ async def create_project(
     except sqlalchemy.exc.IntegrityError:
 
         project_in_user_id = project_in.user_id
+        #TODO Начинаем зависеть от фастапи, то есть не можем использовать эту функцию где-то еще
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"message": f"project from user with user_id {project_in_user_id} already exists"}

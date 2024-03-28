@@ -55,10 +55,3 @@ class CheckLink:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"message": {'error code': {resp.status_code}}}
             )
-
-# check = CheckLink(link='https://github.com/Palenhame/Django_2.git',
-#                   nickname='Palenhame',
-#                   project_name='Django_2',
-#                   author=True)
-# if check.main():
-#     print('All good')
