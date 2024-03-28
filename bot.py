@@ -161,7 +161,6 @@ def send_project(message, link, difficulty):
         elif "github" in resp:
             bot.send_message(message.chat.id, "Ссылка, которую вы отправили, не ведет на github.",
                              reply_markup=send_project_keyboard)
-            get_project_link(message)
             return
 
         elif "error" in resp:
@@ -176,17 +175,16 @@ def send_project(message, link, difficulty):
 
     if status == 422:
         if "string_too_short" in resp.json()["detail"][0]["type"]:
-            bot.send_message(message.chat.id, "Критерии для ревью должны состоять минимум из 30 символов.")
+            bot.send_message(message.chat.id, "Критерии для ревью должны состоять минимум из 30 символов.",
+                             reply_markup=send_project_keyboard)
         else:
             bot.send_message(message.chat.id, "Уровень сложности должен быть числом от 1 до 10.",
                              reply_markup=send_project_keyboard)
-        get_project_link(message)
         return
 
     if status == 404:
         bot.send_message(message.chat.id, "Не удалось найти проект по отправленной ссылке. "
                                           "Убедитесь, что отправили верную ссылку.", reply_markup=send_project_keyboard)
-        get_project_link(message)
         return
 
     if status == 403:
