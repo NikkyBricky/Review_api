@@ -16,6 +16,7 @@ async def get_project_by_project_difficulty(
         .order_by(Project.user_id)
     )
     result: Result = await session.execute(stmt)
+    # TODO Мы же должны достать один проект из базы, а достаем все
     projects = result.scalars().all()
     return list(projects)
 

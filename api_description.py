@@ -1,5 +1,5 @@
 title = "Review API"
-
+#TODO Это все можно сделать большими буквами
 description = """
 ReviewApp API will help people do peer-to-peer reviews of their projects. 🚀
 
