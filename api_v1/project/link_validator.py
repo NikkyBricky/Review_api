@@ -19,7 +19,7 @@ class CheckLink:
             self.site = site
             self.full = full
 
-    def main(self):
+    def check_link(self):
         answer = False
         if self.full:
             if self.gits() and self.sites():
