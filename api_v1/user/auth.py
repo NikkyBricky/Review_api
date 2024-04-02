@@ -1,5 +1,4 @@
 import bcrypt
-from fastapi import HTTPException, status
 
 
 def hash_password(password):
@@ -14,10 +13,6 @@ def check_password(correct_hashed_password, password):
         password=password.encode(),
         hashed_password=correct_hashed_password,
     )
+    print(result)
     if result:
         return result
-    #TODO Опять же привязаны к фастапи
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail={"message": "password is incorrect"}
-    )
