@@ -1,6 +1,6 @@
-title = "Review API"
-#TODO Это все можно сделать большими буквами
-description = """
+TITLE = "Review API"
+
+DESCRIPTION = """
 ReviewApp API will help people do peer-to-peer reviews of their projects. 🚀
 
 ## Users
@@ -45,7 +45,7 @@ If it is False, the review will be added to database. Otherwise the reviews from
 Only **authorised** users can interact with this object. 
 """
 
-summary = ("ReviewApp finds a pair of users who have projects with the same project difficulty."
+SUMMARY = ("ReviewApp finds a pair of users who have projects with the same project difficulty."
            " Then it allows this users to review their work and send the results to each other. ")
 
-version = "0.0.1"
+VERSION = "0.0.1"
