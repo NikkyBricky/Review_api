@@ -1,26 +1,34 @@
-from pydantic_settings import BaseSettings
-from pydantic import BaseModel
-
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-#TODO Вот это кстати делать то не нужно, у нас же есть настройки от пайдантика, там есть встроенная способность парсинга энв файла
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import PostgresDsn, BaseModel
 
 
 class DbSettings(BaseModel):
-    url: str = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DB_HOST: str
+    DB_PORT: int
+    DB_NAME: str
+    DB_USER: str
+    DB_PASS: str
+    DB_SCHEMA: str = "postgresql+asyncpg"
+
+    @property
+    def url(self):
+        url: str = PostgresDsn.build(scheme=self.DB_SCHEMA, host=self.DB_HOST, port=self.DB_PORT,
+                                     username=self.DB_USER, password=self.DB_PASS,
+                                     path=self.DB_NAME).unicode_string()
+
+        return url
+
+
+class BotSettings(BaseModel):
+    basic_url: str = "http://158.160.138.75/api/v1/"
+    token: str
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_nested_delimiter='__', env_file="../.env")
     api_v1_prefix: str = "/api/v1"
-    db: DbSettings = DbSettings()
+    db: DbSettings
+    bot: BotSettings
     rules_for_review: str = ("Это базовые критерии для ревью проектов. Они могут меняться от одного проекта к другому. "
                              "Вы можете воспользоваться ими, если нужно. Правила:\n\n"
                              "1. Код хорошо читается и понятно организован\n\n"
