@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..user.dependencies import get_user_by_user_id
+from ..user.find_user_info import get_user_by_user_id
 from core.models import Review, Project
 
 
