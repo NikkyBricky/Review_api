@@ -1,9 +1,12 @@
 import requests
 import telebot
 from telebot.types import ReplyKeyboardRemove, BotCommand
+
+from api_bot.content import Bot
 from core.config import settings
 from api_bot.keyboards import make_reply_keyboard
 from api_bot.validator import uri_validator, difficulty_validator
+from api_bot.status_responses import UserStatus, ProjectStatus, ReviewStatus
 
 token = settings.bot.token
 bot = telebot.TeleBot(token=token)
@@ -13,15 +16,14 @@ basic_url = settings.bot.basic_url
 
 @bot.message_handler(commands=["start"])
 def start_bot(message):
-    bot.send_message(message.chat.id, "Привет! Я бот, который предоставит вам возможность писать ревью на проекты"
-                                      "других людей и получать ревью на ваши. Для начала вам нужно зарегистрироваться.",
+    bot.send_message(message.chat.id, Bot.greeting,
                      reply_markup=make_reply_keyboard("register"))
 
 
 @bot.message_handler(commands=["register"])
 @bot.message_handler(content_types=["text"], func=lambda message: message.text.lower() == "зарегистрироваться")
 def start_registering(message):
-    bot.send_message(message.chat.id, "Придумайте пароль <b>(не менее 8 символов)</b>:",
+    bot.send_message(message.chat.id, Bot.ask_password,
                      reply_markup=ReplyKeyboardRemove(), parse_mode="html")
 
     bot.register_next_step_handler(message, register)
@@ -40,16 +42,16 @@ def register(message):
     resp = requests.post(
         url=basic_url + "users/register-user", json=data)
 
-    if resp.status_code in [200, 201]:
-        bot.send_message(message.chat.id, text="Вы успешно добавлены в базу данных!",
+    if resp.status_code == 201:
+        bot.send_message(message.chat.id, text=UserStatus.s_201,
                          reply_markup=make_reply_keyboard("send_project"))
 
     elif resp.status_code == 400:
-        bot.send_message(message.chat.id, text="Такой пользователь уже существует.",
+        bot.send_message(message.chat.id, text=UserStatus.s_400,
                          reply_markup=make_reply_keyboard("send_project"))
 
     elif resp.status_code == 422:
-        bot.send_message(message.chat.id, text="Пароль слишком короткий, попробуйте еще раз.")
+        bot.send_message(message.chat.id, text=UserStatus.s_422)
 
         bot.register_next_step_handler(message, register)
         return
@@ -58,7 +60,7 @@ def register(message):
 @bot.message_handler(commands=["send_project"])
 @bot.message_handler(content_types=["text"], func=lambda message: message.text.lower() == "отправить проект")
 def get_project_link(message):
-    bot.send_message(message.chat.id, "Отправьте  <b>ссылку на github </b> проекта:", parse_mode="html",
+    bot.send_message(message.chat.id, Bot.ask_link, parse_mode="html",
                      reply_markup=ReplyKeyboardRemove())
 
     bot.register_next_step_handler(message, get_project_difficulty)
@@ -71,27 +73,11 @@ def get_project_difficulty(message, link=None):
 
     is_link = uri_validator(link)
     if not is_link:
-        bot.send_message(message.chat.id, "Не получилось открыть вашу ссылку. Попробуйте снова.")
+        bot.send_message(message.chat.id, ProjectStatus.s_400_error_link)
         get_project_link(message)
         return
 
-    bot.send_message(message.chat.id, "Оцените сложность своего проекта от 1 до 10:\n\n"
-                                      "Расчет сложности <b>(начиная с 1 балла)</b> "
-                                      "производится по следующим параметрам:\n\n"
-                                      "1. В одном из файлов проекта более 300 строк кода "
-                                      "(текстовые файлы не считаются). <b>(+2 балла)</b>\n\n"
-                                      "2. В проекте использованы малоизвестные/новые библиотеки и модули. "
-                                      "<b>(+1 балл)</b>\n\n"
-                                      "3. В проекте не менее 3 файлов кода, "
-                                      "в каждом из которых не менее 100 строк кода"
-                                      " (README, requirements и .env не считаются).  <b>(+2 балла)</b>\n\n"
-                                      "4. Код проекта сложно читать, "
-                                      "названия переменных и функций не соответствуют"
-                                      " их назначению. <b>(+1 балл)</b>\n\n"
-                                      "5. Отсутствует документация к проекту.  <b>(+1 балл)</b>\n\n"
-                                      "6. Отсутствует модульность проекта. "
-                                      "Все элементы, относящиеся к разным задачам,"
-                                      " собраны в одном файле.  <b>(+2 балла)</b>\n\n", parse_mode="html")
+    bot.send_message(message.chat.id, Bot.ask_difficulty, parse_mode="html")
 
     bot.register_next_step_handler(message, ask_about_rules, link)
 
@@ -101,20 +87,11 @@ def ask_about_rules(message, link):
 
     is_difficulty = difficulty_validator(difficulty)
     if not is_difficulty:
-        bot.send_message(message.chat.id, "Уровень сложности должен быть числом от 1 до 10.")
+        bot.send_message(message.chat.id, ProjectStatus.s_422_project_difficulty)
         get_project_difficulty(message, link)
         return
 
-    bot.send_message(message.chat.id, "Если хотите отправить критерии к проекту, то можете это сделать прямо"
-                                      " сейчас. Если нет, то будут отправлены базовые критерии:\n\n"
-                                      "1. Код хорошо читается и понятно организован\n\n"
-                                      "2. Функциональность проекта соответствует задаче заказчика.\n\n"
-                                      "3. Код запускается и не выдает ошибку при попытке его запустить или как-либо "
-                                      "взаимодействовать с ним.\n\n"
-                                      "4. Присутствует документация к проекту.\n\n"
-                                      "5. Функции реализованы без багов и работают так, "
-                                      "как описаны в документации к проекту.\n\n"
-                                      "Критерии для ревью должны состоять минимум из 30 символов.",
+    bot.send_message(message.chat.id, Bot.ask_rules,
                      reply_markup=make_reply_keyboard("not_rules"), parse_mode="html")
 
     bot.register_next_step_handler(message, send_project, link, difficulty)
@@ -132,7 +109,7 @@ def send_project(message, link, difficulty):
 
     if rules != "Отправить базовые правила":
         if len(rules) < 30:
-            bot.send_message(message.chat.id, "Критерии для ревью должны состоять минимум из 30 символов.",
+            bot.send_message(message.chat.id, ProjectStatus.s_422_review_length,
                              reply_markup=make_reply_keyboard("send_project"))
             bot.register_next_step_handler(message, send_project, link, difficulty)
             return
@@ -149,48 +126,41 @@ def send_project(message, link, difficulty):
         resp = resp.json()["detail"]["message"]
 
         if "review" in resp:
-            bot.send_message(message.chat.id, "Прежде чем отправить следующий проект, дождитесь, "
-                                              "когда будет проверен предыдущий. Обычно это занимает не более 24 часов.",
+            bot.send_message(message.chat.id, ProjectStatus.s_400_error_review,
                              reply_markup=make_reply_keyboard("send_review"))
 
         elif "github" in resp:
-            bot.send_message(message.chat.id, "Ссылка, которую вы отправили, не ведет на github.",
+            bot.send_message(message.chat.id, ProjectStatus.s_400_github,
                              reply_markup=make_reply_keyboard("send_project"))
             return
 
         elif "error" in resp:
-            bot.send_message(message.chat.id, "Не получилось открыть вашу ссылку. Попробуйте снова.",
+            bot.send_message(message.chat.id, ProjectStatus.s_400_error_link,
                              reply_markup=make_reply_keyboard("send_project"))
 
         else:
-            bot.send_message(message.chat.id, "Другой ваш проект уже был отправлен."
-                                              " Дождитесь его ревью прежде чем отправить следующий, "
-                                              "либо удалите его, используя команду /delete_project или с помощью кнопки"
-                                              ' "Удалить проект".', reply_markup=make_reply_keyboard("delete_project"))
+            bot.send_message(message.chat.id, ProjectStatus.s_400_error_project,
+                             reply_markup=make_reply_keyboard("delete_project"))
 
     if status == 422:
         if "string_too_short" in resp.json()["detail"][0]["type"]:
-            bot.send_message(message.chat.id, "Критерии для ревью должны состоять минимум из 30 символов.",
+            bot.send_message(message.chat.id, ProjectStatus.s_422_review_length,
                              reply_markup=make_reply_keyboard("send_project"))
         else:
-            bot.send_message(message.chat.id, "Уровень сложности должен быть числом от 1 до 10.",
+            bot.send_message(message.chat.id, ProjectStatus.s_422_project_difficulty,
                              reply_markup=make_reply_keyboard("send_project"))
         return
 
     if status == 404:
-        bot.send_message(message.chat.id, "Не удалось найти проект по отправленной ссылке. "
-                                          "Убедитесь, что отправили верную ссылку.",
+        bot.send_message(message.chat.id, ProjectStatus.s_404_no_project,
                          reply_markup=make_reply_keyboard("send_project"))
         return
 
     if status == 403:
-        bot.send_message(message.chat.id, "Кажется, вы не авторизованы, поэтому вы не можете отправить проект. "
-                                          "Чтобы авторизоваться, используйте команду /register или кнопку"
-                                          ' "Зарегистрироваться"', reply_markup=make_reply_keyboard("register"))
+        bot.send_message(message.chat.id, ProjectStatus.s_403, reply_markup=make_reply_keyboard("register"))
 
     if status == 201:
-        bot.send_message(message.chat.id, "Ваш проект успешно добавлен в очередь на ревью. "
-                                          "Когда наступит ваша очередь, вам придет уведомление.",
+        bot.send_message(message.chat.id, ProjectStatus.s_201,
                          reply_markup=make_reply_keyboard("delete_project"))
 
     if status == 200:
@@ -206,10 +176,7 @@ def send_project(message, link, difficulty):
         rules_2 = user_data_2["rules"]
 
         for user in [user_id_1, user_id_2]:
-            bot.send_message(chat_id=user, text="Пара для ревью успешно найдена. Можете начать работу над ним."
-                                                " Примечание:\nВаше ревью должно состоять "
-                                                "минимум из <b>70 символов</b> и содержать в себе "
-                                                "<b>все критерии</b>, описанные ниже.",
+            bot.send_message(chat_id=user, text=ProjectStatus.s_200,
                              reply_markup=make_reply_keyboard("send_review"), parse_mode="html")
 
         bot.send_message(chat_id=user_id_1, text="<b>Ссылка </b> на проект, на который необходимо сделать ревью:\n"
@@ -238,18 +205,18 @@ def delete_project(message):
     status = resp.status_code
 
     if status == 204:
-        bot.send_message(message.chat.id, "Ваш проект успешно удален.",
+        bot.send_message(message.chat.id, ProjectStatus.s_204,
                          reply_markup=make_reply_keyboard("send_project"))
 
     if status == 404:
-        bot.send_message(message.chat.id, "На данный момент у вас нет ни одного проекта в базе данных.",
+        bot.send_message(message.chat.id, ProjectStatus.s_404_successful_delete,
                          reply_markup=make_reply_keyboard("send_project"))
 
 
 @bot.message_handler(commands=["send_review"])
 @bot.message_handler(content_types=["text"], func=lambda message: message.text.lower() == "отправить ревью")
 def get_review(message):
-    bot.send_message(message.chat.id, "Можете отправить ваше  <b>ревью: </b>", parse_mode="html")
+    bot.send_message(message.chat.id, Bot.ask_review, parse_mode="html")
     bot.register_next_step_handler(message, send_review)
 
 
@@ -269,31 +236,26 @@ def send_review(message):
     status = resp.status_code
 
     if status == 403:
-        bot.send_message(message.chat.id, "Кажется, вы не авторизованы, поэтому вы не можете отправить проект. "
-                                          "Чтобы авторизоваться, используйте команду /register или кнопку"
-                                          ' "Зарегистрироваться"', reply_markup=make_reply_keyboard("register"))
+        bot.send_message(message.chat.id, ReviewStatus.s_403, reply_markup=make_reply_keyboard("register"))
 
     if status == 404:
         resp = resp.json()["detail"]["message"]
 
         if "pair" in resp:
-            bot.send_message(message.chat.id, "Ваша очередь еще не подошла, поэтому у вас пока нет пары для ревью.",
+            bot.send_message(message.chat.id, ReviewStatus.s_404_no_pair,
                              reply_markup=make_reply_keyboard("delete_project"))
 
         elif "project" in resp:
-            bot.send_message(message.chat.id, "На данный момент у вас нет ни одного проекта в базе данных.",
+            bot.send_message(message.chat.id, ReviewStatus.s_404_no_project,
                              reply_markup=make_reply_keyboard("send_project"))
 
     if status == 422:
-        bot.send_message(message.chat.id, "Ваше ревью слишком короткое. Попробуйте снова.")
+        bot.send_message(message.chat.id, ReviewStatus.s_422)
         get_review(message)
         return
 
     if status == 201:
-        bot.send_message(message.chat.id, "Ваше ревью успешно добавлено в базу данных. "
-                                          "Когда ваш напарник осуществит ревью вашего проекта, вы сможете обменяться "
-                                          "ими. Если хотите удалить его, используйте команду /delete_review или кнопку"
-                                          ' "Удалить ревью"', reply_markup=make_reply_keyboard("delete_review"))
+        bot.send_message(message.chat.id, ReviewStatus.s_201, reply_markup=make_reply_keyboard("delete_review"))
 
     if status == 200:
         resp = resp.json()["reviews"]
@@ -304,7 +266,7 @@ def send_review(message):
         review_2 = resp["review_for_2"]
 
         for user in [user_id_1, user_id_2]:
-            bot.send_message(chat_id=user, text=f" <b>Ревью вашего проекта успешно выполнено! </b>",
+            bot.send_message(chat_id=user, text=ReviewStatus.s_200,
                              reply_markup=make_reply_keyboard("send_project"), parse_mode="html")
 
         bot.send_message(chat_id=user_id_1, text=review_1)
@@ -325,11 +287,11 @@ def delete_review(message):
     status = resp.status_code
 
     if status == 204:
-        bot.send_message(message.chat.id, "Ваше ревью успешно удалено.",
+        bot.send_message(message.chat.id, ReviewStatus.s_204,
                          reply_markup=make_reply_keyboard("send_review"))
 
     if status == 404:
-        bot.send_message(message.chat.id, "На данный момент вы не находитесь в паре для ревью.")
+        bot.send_message(message.chat.id, ReviewStatus.s_404_no_pair)
 
 
 commands = [
