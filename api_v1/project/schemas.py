@@ -4,7 +4,7 @@ from annotated_types import MinLen
 from core.config import settings
 from pydantic import BaseModel, Field
 from pydantic import field_validator as validator
-from validators import CheckLink
+from .link_validator import CheckLink
 
 
 class ProjectBase(BaseModel):
@@ -13,18 +13,13 @@ class ProjectBase(BaseModel):
     user_id: int
     rules: Annotated[str, MinLen(30)] = settings.rules_for_review
 
-    # TODO Я бы не особо парился с созданием класса под это, но дело ваше
     @validator('project_link')
-    def check_link(cls, value):
+    def link_checking(cls, value):
         return CheckLink(
             link=value,
             full=True
-        ).main()
+        ).check_link()
 
-# TODO Это чисто для будущего расширения?
+
 class ProjectCreate(ProjectBase):
-    pass
-
-
-class ProjectSchema(ProjectBase):
     pass

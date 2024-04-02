@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .schemas import UserSchema, UserCreate
@@ -25,7 +25,14 @@ async def login_user(
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
 
-    await crud.log_in_user(session=session, user_in=user_in)
+    result = await crud.log_in_user(session=session, user_in=user_in)
+
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "password is incorrect"}
+        )
+
     return {"message": "password is correct"}
 
 

@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .dependencies import get_review_by_user_id
+from .find_user_info import get_review_by_user_id
 from .schemas import ReviewCreate, ReviewSend, ReviewDelete
 from core.models import Review
 
-#TODO Тут все аналогично project
+
 async def create_review(
         session: AsyncSession,
         review_in_1: ReviewCreate,
@@ -46,11 +46,7 @@ async def process_review(
         for review_data, value in review_in.model_dump(exclude_unset=True).items():
             setattr(user_review, review_data, value)
         await session.commit()
-
-        raise HTTPException(
-            status_code=status.HTTP_201_CREATED,
-            detail={"message": f"successfully added review from user with user_id {user_id} to database"}
-        )
+        return
 
     user_review_text = review_in.review_text
 
