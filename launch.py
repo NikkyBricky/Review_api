@@ -1,5 +1,5 @@
 import uvicorn
-from api_bot.bot import start_bot
+from api_bot.bot import run_bot
 from multiprocessing import Process
 import logging
 
@@ -13,7 +13,6 @@ logging.basicConfig(
 )
 
 
-
 def start_api():
     uvicorn.run("main:app", reload=True, port=5000)
 
@@ -23,7 +22,7 @@ if __name__ == "__main__":
     api.start()
     logging.info("Апи запущено")
     print("Апи запущено")
-    api_bot = Process(target=start_bot)
+    api_bot = Process(target=run_bot)
     api_bot.start()
     logging.info("Бот запущен")
     print("Бот запущен")
