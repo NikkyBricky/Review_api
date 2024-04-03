@@ -3,7 +3,8 @@ Description=review bot for yandex
 
 [Service]
 Type=simple
-ExecStart=/home/student/Kudesniki_review_api/venv/bin/python3 /home/student/Kudesniki_review_api/bot.py
+WorkingDirectory=/home/student/Kudesniki_review_api
+ExecStart=/home/student/Kudesniki_review_api/venv/bin/python3 ./api_bot/bot.py
 Restart=always
 RestartSec=5
 
