@@ -2,8 +2,10 @@ import requests
 import telebot
 from telebot.types import ReplyKeyboardRemove, BotCommand
 
-from api_bot.content import Bot
+
 from core.config import settings
+
+from api_bot.content import Bot
 from api_bot.keyboards import make_reply_keyboard
 from api_bot.validator import uri_validator, difficulty_validator
 from api_bot.status_responses import UserStatus, ProjectStatus, ReviewStatus
