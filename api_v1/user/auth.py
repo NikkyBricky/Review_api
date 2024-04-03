@@ -13,6 +13,6 @@ def check_password(correct_hashed_password, password):
         password=password.encode(),
         hashed_password=correct_hashed_password,
     )
-    print(result)
+
     if result:
         return result
