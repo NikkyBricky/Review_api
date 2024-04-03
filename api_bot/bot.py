@@ -11,7 +11,7 @@ from config import settings
 
 token = settings.bot.token
 bot = telebot.TeleBot(token=token)
-print(token)
+
 basic_url = settings.bot.basic_url
 
 
@@ -304,11 +304,9 @@ commands = [
         BotCommand('delete_review', 'удалить ревью')
     ]
 
-print(1)
-
 
 def run_bot():
-    print(2)
+
     bot.set_my_commands(commands)
     bot.polling(none_stop=True)
-    print(3)
+
