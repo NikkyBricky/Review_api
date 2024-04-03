@@ -295,18 +295,18 @@ def delete_review(message):
         bot.send_message(message.chat.id, ReviewStatus.s_404_no_pair)
 
 
-# commands = [
-#         BotCommand('start', 'запуск бота'),
-#         BotCommand('register', 'зарегистрироваться'),
-#         BotCommand('send_project', 'отправить проект'),
-#         BotCommand('delete_project', 'удалить проект'),
-#         BotCommand('send_review ', 'отправить ревью'),
-#         BotCommand('delete_review', 'удалить ревью')
-#     ]
+commands = [
+        BotCommand('start', 'запуск бота'),
+        BotCommand('register', 'зарегистрироваться'),
+        BotCommand('send_project', 'отправить проект'),
+        BotCommand('delete_project', 'удалить проект'),
+        BotCommand('send_review ', 'отправить ревью'),
+        BotCommand('delete_review', 'удалить ревью')
+    ]
 
 
 def run_bot():
 
-    # bot.set_my_commands(commands)
+    bot.set_my_commands(commands)
     bot.polling(none_stop=True, path_to_watch="api_bot/bot.py")
 
