@@ -5,10 +5,10 @@ from telebot.types import ReplyKeyboardRemove, BotCommand
 
 from core.config import settings
 
-from api_bot.content import Bot
-from api_bot.keyboards import make_reply_keyboard
-from api_bot.validator import uri_validator, difficulty_validator
-from api_bot.status_responses import UserStatus, ProjectStatus, ReviewStatus
+from botty.content import Bot
+from botty.keyboards import make_reply_keyboard
+from botty.validator import uri_validator, difficulty_validator
+from botty.status_responses import UserStatus, ProjectStatus, ReviewStatus
 
 token = settings.bot.token
 bot = telebot.TeleBot(token=token)
