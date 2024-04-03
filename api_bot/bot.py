@@ -310,8 +310,3 @@ def run_bot():
     bot.set_my_commands(commands)
     bot.polling(none_stop=True)
     print(3)
-
-
-if __name__ == "__main__":
-
-    bot.infinity_polling()
