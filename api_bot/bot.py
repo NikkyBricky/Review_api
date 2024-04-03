@@ -304,7 +304,11 @@ commands = [
         BotCommand('delete_review', 'удалить ревью')
     ]
 
-# if __name__ == "__main__":
-#     bot.set_my_commands(commands)
-#
-#     bot.infinity_polling()
+
+def start_bot():
+    bot.polling(none_stop=True)
+
+if __name__ == "__main__":
+    bot.set_my_commands(commands)
+
+    bot.infinity_polling()
