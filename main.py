@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from api_v1 import router as router_v1
-from core.config import settings
+from config import settings
 from api_description import TITLE, DESCRIPTION, SUMMARY, VERSION
 
 app = FastAPI(
