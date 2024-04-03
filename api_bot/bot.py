@@ -305,7 +305,7 @@ commands = [
     ]
 
 
-def start_bot():
+def run_bot():
     bot.polling(none_stop=True)
 
 if __name__ == "__main__":
