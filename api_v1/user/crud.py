@@ -1,3 +1,4 @@
+import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
@@ -13,13 +14,6 @@ async def create_user(
 ):
     user_id = user_in.user_id
 
-    user_exists = get_user_by_user_id(session=session, user_id=user_id)
-    if user_exists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "user already exists"}
-        )
-
     password = user_in.password
     hashed_password = hash_password(password=password)
 
@@ -27,7 +21,13 @@ async def create_user(
 
     session.add(user)
 
-    await session.commit()
+    try:
+        await session.commit()
+    except sqlalchemy.exc.IntegrityError:
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "user already exists"})
 
     await session.refresh(user)
 
