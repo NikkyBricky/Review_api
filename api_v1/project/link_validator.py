@@ -44,11 +44,11 @@ class CheckLink:
         resp = get(self.link)
         if resp.status_code == 200:
             return True
-        elif resp.status_code == 404:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={"message": 'Project not found.'}
-            )
+        # elif resp.status_code == 404:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_404_NOT_FOUND,
+        #         detail={"message": 'Project not found.'}
+        #     )
 
         else:
             raise HTTPException(
