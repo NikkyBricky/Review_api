@@ -3,6 +3,7 @@ Description=review api for yandex
 
 [Service]
 Type=simple
+WorkingDirectory=/home/student/Kudesniki_review_api
 ExecStart=/home/student/Kudesniki_review_api/venv/bin/python3 /home/student/Kudesniki_review_api/launch.py
 Restart=always
 RestartSec=5
