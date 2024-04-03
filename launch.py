@@ -11,5 +11,5 @@ if __name__ == "__main__":
     api = Process(target=start_api)
     api.start()
 
-    api_bot = Process(target=run_bot)
-    api_bot.start()
+    # api_bot = Process(target=run_bot)
+    # api_bot.start()
