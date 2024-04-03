@@ -308,5 +308,5 @@ def delete_review(message):
 def run_bot():
 
     # bot.set_my_commands(commands)
-    bot.polling(none_stop=True)
+    bot.polling(none_stop=True, path_to_watch="api_bot/bot.py")
 
