@@ -1,5 +1,4 @@
 import uvicorn
-from api_bot.bot import run_bot
 from multiprocessing import Process
 
 
