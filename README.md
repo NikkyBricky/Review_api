@@ -17,3 +17,5 @@ If you want to use it yourself:
 5. write this in your console ```alembic upgrade head```
 6. Run launch.py 
 
+# Documentation 
+You can see all the documentation if you go to this [link](http://158.160.138.75/docs)
