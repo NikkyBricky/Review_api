@@ -305,7 +305,8 @@ commands = [
     ]
 
 
-if __name__ == "__main__":
+def run_bot():
+
     bot.set_my_commands(commands)
     bot.polling(none_stop=True, path_to_watch="api_bot/bot.py")
 
