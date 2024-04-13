@@ -4,6 +4,8 @@ A project that can help people do peer-2-peer reviews of their projects.
 ReviewApp finds a pair of users who have projects with the same project difficulty. Then it allows this users to review their work and send the results to each other.
 
 ReviewApp API will help people do peer-to-peer reviews of their projects. 🚀
+
+There is also a bot that shows how the API works.
 # Usage
 If you want to see it work, go to this [link](http://158.160.138.75/docs) (Documentation is also there)
 
