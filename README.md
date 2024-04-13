@@ -15,9 +15,10 @@ If you want to use it yourself:
 1. Clone this repository ```git clone https://github.com/NikkyBricky/Kudesniki_review_api.git```
 2. Install poetry ```pip install poetry```
 3. Install all the packages using poetry ```poetry install```
-4. Change example.env to .env file and write your own data there
-5. write this in your console ```alembic upgrade head```
-6. Run launch.py 
+4. Make sure, that you have postgreSQL installed on your PC
+5. Change example.env to .env file and write your own data there
+6. write this in your console ```alembic upgrade head```
+7. Run launch.py 
 
 # Documentation 
 You can see all the documentation if you go to this [link](http://158.160.138.75/docs)
