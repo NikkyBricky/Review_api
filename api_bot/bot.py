@@ -152,19 +152,19 @@ def send_project(message, link, difficulty):
                              reply_markup=make_reply_keyboard("send_project"))
         return
 
-    if status == 404:
+    elif status == 404:
         bot.send_message(message.chat.id, ProjectStatus.s_404_no_project,
                          reply_markup=make_reply_keyboard("send_project"))
         return
 
-    if status == 403:
+    elif status == 403:
         bot.send_message(message.chat.id, ProjectStatus.s_403, reply_markup=make_reply_keyboard("register"))
 
-    if status == 201:
+    elif status == 201:
         bot.send_message(message.chat.id, ProjectStatus.s_201,
                          reply_markup=make_reply_keyboard("delete_project"))
 
-    if status == 200:
+    elif status == 200:
         resp = resp.json()
         user_data_1 = resp["user_data"]
         user_id_1 = user_data_1["user_id"]
@@ -209,7 +209,7 @@ def delete_project(message):
         bot.send_message(message.chat.id, ProjectStatus.s_204,
                          reply_markup=make_reply_keyboard("send_project"))
 
-    if status == 404:
+    elif status == 404:
         bot.send_message(message.chat.id, ProjectStatus.s_404_successful_delete,
                          reply_markup=make_reply_keyboard("send_project"))
 
@@ -239,7 +239,7 @@ def send_review(message):
     if status == 403:
         bot.send_message(message.chat.id, ReviewStatus.s_403, reply_markup=make_reply_keyboard("register"))
 
-    if status == 404:
+    elif status == 404:
         resp = resp.json()["detail"]["message"]
 
         if "pair" in resp:
@@ -250,15 +250,15 @@ def send_review(message):
             bot.send_message(message.chat.id, ReviewStatus.s_404_no_project,
                              reply_markup=make_reply_keyboard("send_project"))
 
-    if status == 422:
+    elif status == 422:
         bot.send_message(message.chat.id, ReviewStatus.s_422)
         get_review(message)
         return
 
-    if status == 201:
+    elif status == 201:
         bot.send_message(message.chat.id, ReviewStatus.s_201, reply_markup=make_reply_keyboard("delete_review"))
 
-    if status == 200:
+    elif status == 200:
         resp = resp.json()["reviews"]
         user_id_1 = resp["user_id_1"]
         review_1 = resp["review_for_1"]
@@ -291,7 +291,7 @@ def delete_review(message):
         bot.send_message(message.chat.id, ReviewStatus.s_204,
                          reply_markup=make_reply_keyboard("send_review"))
 
-    if status == 404:
+    elif status == 404:
         bot.send_message(message.chat.id, ReviewStatus.s_404_no_pair)
 
 
@@ -309,4 +309,3 @@ def run_bot():
 
     bot.set_my_commands(commands)
     bot.polling(none_stop=True, path_to_watch="api_bot/bot.py")
-
