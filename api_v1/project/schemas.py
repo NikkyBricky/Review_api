@@ -1,7 +1,7 @@
 from typing import Annotated
 from annotated_types import MinLen
 
-from config import settings
+from core.config import settings
 from pydantic import BaseModel, Field
 from pydantic import field_validator as validator
 from .link_validator import CheckLink

@@ -7,7 +7,7 @@ from api_bot.keyboards import make_reply_keyboard
 from api_bot.validator import uri_validator, difficulty_validator
 from api_bot.status_responses import UserStatus, ProjectStatus, ReviewStatus
 
-from config import settings
+from core.config import settings
 
 token = settings.bot.token
 bot = telebot.TeleBot(token=token)

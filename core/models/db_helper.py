@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncSession
 )
-from config import settings
+from core.config import settings
 
 
 class Databasehelper:

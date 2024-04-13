@@ -16,3 +16,4 @@ If you want to use it yourself:
 4. Change example.env to .env file and write your own data there
 5. write this in your console ```alembic upgrade head```
 6. Run launch.py 
+

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 from .mixins import UserRelationMixin
-from config import settings
+from core.config import settings
 
 
 class Project(UserRelationMixin, Base):
