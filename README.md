@@ -9,7 +9,7 @@ There is also a bot that shows how the API works.
 # Usage
 If you want to see it work, go to this [link](http://158.160.138.75/docs) (Documentation is also there)
 
-If you want to see the telegram bot for this API go to this [link](https://t.me/p2p_review_bot)
+The telegram bot for this API is [here](https://t.me/p2p_review_bot)
 
 If you want to use it yourself:
 1. Clone this repository ```git clone https://github.com/NikkyBricky/Kudesniki_review_api.git```
